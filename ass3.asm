@@ -1,6 +1,7 @@
 .model small
 .stack 100h
 .data
+	INVENTORY_SIZE equ 40
 	; inventory on id, name, quantity, price, priority level
 	inventory dw 0,1,2,3,4,5,6,7,8,9
 						db "Apples    ",  "Oranges   ", "Potatoes  ", "Tomatoes  ", "Onions    ", "Lemons    ", "Milk      ", "Eggs      ", "Bread     ", "Cheese    "
@@ -15,7 +16,7 @@
 	crlf db 13,10,'$'
 	sline db 13,10, '----------------------------------------------' ,'$'
 	dline db 13,10, '==============================================' ,'$'
-	dotted db 13,10, '**********************************************','$'
+	dotted db '**********************************************','$'
 
 	; main menu
 	menu db 13,10, '----------<APU MINI GROCERY STALL>----------',13,10, '------------------MAIN MENU-----------------', 13, 10, 10 ,'1. View Inventory',13,10,'2. Restock Item',13,10,'3. Sell Items',13,10, '4. Search Item',13,10,'5. Sales Report',13,10,'0. Exit',13,10,'$'
@@ -25,21 +26,19 @@
 	; view inventory
 	inventory_header db 13,10, '----------<APU MINI GROCERY STALL>----------',13,10, '----------------<INVENTORY>-----------------',13,10,'ID',9,'Name',9,9, 'Quantity',9, 'Price',13,10,'$'
 	inventory_label db '==============================================', 13, 10, 'Items that needs to be restock are displayed as RED!', 13, 10, '==============================================', 13, 10, '1. Go Back', 13, 10, '0. Exit the Program', 13, 10 , 13, 10,'Enter your choice: $'
-
-	; add items
+	
 	stock_amount dw ?
 	stock_id dw ?
 
+	; add items
 	restock_label db '==============================================', 13, 10,9,9, 32,32,'RESTOCK ITEM', 13, 10, '==============================================', 13, 10, 'Select an item ID to restock: $'
 	restock_amount_label db 13, 10, 'Enter the amount to restock (between 1-9): $'
 	restock_success db 13, 10, 'Item has been restocked successfully!', 13, 10, '$'
+	; sell items 
 	sell_item_id_label db 13, 10, 'Enter the item ID to sell: $'
 	sell_item_amount_label db 13, 10, 'Enter the amount to sell (between 1-9): $'
-
-	; sell items 
-
-
-	
+	sell_item_success db 13, 10, 'Item has been sold successfully!', 13, 10, '$'
+	sell_item_fail db 13, 10, 'Item cannot be sold, not enough quantity!', 13, 10, '$'
 
 	; misc
 	user_choice db 13, 10, 'Enter your choice: $'
@@ -78,17 +77,20 @@ main proc
 
 	jmp main
 ; ********************************************
-; ************* INTERFACE FUNCTIONS s**********
+; ************* INTERFACE FUNCTIONS **********
 ; ********************************************
 	view_inventory_interface:
+		call clear_screen
 		call view_inventory
 		call user_navigate
 		ret
 	restock_inventory_interface:
+	  call clear_screen
 		call view_inventory
 		call restock_inventory
 		ret
 	sales_inventory_interface:
+	  call clear_screen
 		call view_inventory
 		call sales_inventory
 		ret
@@ -104,7 +106,7 @@ main proc
 		ret
 
 ; ********************************************
-; *********** HELPER FUNCTIONS #1 ************
+; *********** SUBROUTINE FUNCTION ************
 ; ********************************************
 user_navigate:
 	; Code to navigate user
@@ -213,7 +215,6 @@ draw_menu:
 
 view_inventory:
 	; code to view inventory 
-	call clear_screen
 	mov dx, offset inventory_header
 	mov ah, 09
 	int 21h
@@ -281,7 +282,16 @@ restock_inventory:
 	add cx, [si]
 	mov word ptr [si], cx
 	
-	call main
+	call clear_screen
+	call print_newline
+	call print_asterisk
+	lea dx, restock_success
+	mov ah, 09h 
+	int 21h 
+	call print_asterisk
+	call print_newline
+	call view_inventory
+	call user_navigate
 	ret
 
 sales_inventory:
@@ -316,14 +326,35 @@ sales_inventory:
 	js reset_quantity
 
 	mov word ptr [si], bx
-	call main
+	jmp sold_quantity
 
 	reset_quantity: 
 		mov bx, [si]
 		mov word ptr [si], bx
-		call main
+		call clear_screen
+		call print_newline
+		call print_asterisk
+		lea dx, sell_item_fail
+		mov ah, 09h 
+		int 21h 
+		call print_asterisk
+		call print_newline
+		call view_inventory
+		call user_navigate
 		ret
-
+	
+	sold_quantity:
+		call clear_screen
+		call print_newline
+		call print_asterisk
+		lea dx, sell_item_success
+		mov ah, 09h 
+		int 21h 
+		call print_asterisk
+		call print_newline
+		call view_inventory
+		call user_navigate
+		ret
 	ret
 
 search_inventory:
@@ -337,7 +368,7 @@ sales_report:
 	ret
 
 ; **********************************************
-; ************ HELPER FUNCTIONS #0**************
+; ************* HELPER FUNCTIONS ***************
 ; **********************************************
 exit_program:
 	; Code to exit program
@@ -392,7 +423,11 @@ print_newline:
 	mov ah, 02
 	int 21h
 	ret
-
+print_asterisk:
+	lea dx, dotted
+	mov ah, 09h 
+	int 21h 
+	ret
 
 main endp
 end main
