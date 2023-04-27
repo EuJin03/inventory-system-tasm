@@ -27,14 +27,16 @@
 	inventory_label db '==============================================', 13, 10, 'Items that needs to be restock are displayed as RED!', 13, 10, '==============================================', 13, 10, '1. Go Back', 13, 10, '0. Exit the Program', 13, 10 , 13, 10,'Enter your choice: $'
 
 	; add items
-	restock_amount dw ?
-	restock_id dw ?
+	stock_amount dw ?
+	stock_id dw ?
 
 	restock_label db '==============================================', 13, 10,9,9, 32,32,'RESTOCK ITEM', 13, 10, '==============================================', 13, 10, 'Select an item ID to restock: $'
 	restock_amount_label db 13, 10, 'Enter the amount to restock (between 1-9): $'
 	restock_success db 13, 10, 'Item has been restocked successfully!', 13, 10, '$'
+	sell_item_id_label db 13, 10, 'Enter the item ID to sell: $'
+	sell_item_amount_label db 13, 10, 'Enter the amount to sell (between 1-9): $'
 
-	; deduct items 
+	; sell items 
 
 
 	
@@ -76,16 +78,18 @@ main proc
 
 	jmp main
 ; ********************************************
-; ************* INTERFACE FUNCTIONS **********
+; ************* INTERFACE FUNCTIONS s**********
 ; ********************************************
 	view_inventory_interface:
 		call view_inventory
 		call user_navigate
 		ret
 	restock_inventory_interface:
+		call view_inventory
 		call restock_inventory
 		ret
 	sales_inventory_interface:
+		call view_inventory
 		call sales_inventory
 		ret
 	search_inventory_interface:
@@ -249,7 +253,6 @@ view_inventory:
 	ret
 
 restock_inventory:
-	call view_inventory
 	; Code to restock item
 	lea dx, restock_label
 	mov ah, 09h
@@ -261,7 +264,7 @@ restock_inventory:
 	sub al, 30h 
 	add al, al
 	sub ax, 136
-	mov restock_id, ax 
+	mov stock_id, ax 
 
 	lea dx, restock_amount_label
 	mov ah, 09h 
@@ -273,11 +276,8 @@ restock_inventory:
 	sub ax, 256
 	mov cx, ax
 
-
-	call print_newline
-
 	lea si, inventory
-	add si, restock_id
+	add si, stock_id
 	add cx, [si]
 	mov word ptr [si], cx
 	
@@ -285,8 +285,45 @@ restock_inventory:
 	ret
 
 sales_inventory:
-	; Code to sell item
-	call view_inventory
+	; Code to restock item
+	lea dx, sell_item_id_label
+	mov ah, 09h
+	int 21h 
+
+	mov ah, 01
+	int 21h
+
+	sub al, 30h 
+	add al, al
+	sub ax, 136
+	mov stock_id, ax 
+
+	lea dx, sell_item_amount_label
+	mov ah, 09h 
+	int 21h
+
+	mov ah, 01
+	int 21h
+	sub al, 30h
+	sub ax, 256
+	mov cx, ax
+
+	lea si, inventory
+	add si, stock_id
+	mov bx, [si] 
+	sub bx, cx
+	cmp bx, 0
+	js reset_quantity
+
+	mov word ptr [si], bx
+	call main
+
+	reset_quantity: 
+		mov bx, [si]
+		mov word ptr [si], bx
+		call main
+		ret
+
 	ret
 
 search_inventory:
