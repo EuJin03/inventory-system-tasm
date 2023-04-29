@@ -5,7 +5,7 @@
 	; inventory on id, name, quantity, price, priority level
 	inventory dw 0,1,2,3,4,5,6,7,8,9
 						db "Apples    ",  "Oranges   ", "Potatoes  ", "Tomatoes  ", "Onions    ", "Lemons    ", "Milk      ", "Eggs      ", "Bread     ", "Cheese    "
-						dw 10, 15, 8, 20, 5, 12, 7, 3, 6, 9, 1, 7, 1, 1, 2, 7, 1, 2, 7, 1, 1, 0, 1, 1, 2, 0, 1, 2, 0, 1, '$'
+						dw 10, 15, 8, 20, 5, 12, 7, 3, 6, 9, 4, 7, 3, 1, 2, 7, 5, 2, 7, 9, 1, 0, 1, 1, 2, 0, 1, 2, 0, 1, '$'
 	
 	inventory_id_offset dw 0
 	inventory_name_offset dw 20
@@ -418,7 +418,7 @@ sort_inventory:
 	je low_in_stock_prompt 
 	
 	cmp al, '1'
-	call sort_inventory
+	call main
 
 	ret
 
@@ -536,7 +536,7 @@ sales_report:
   mov bp, 0
 	lea si, inventory
 	mov bx, offset sales 
-	mov di, offset item_price
+	mov di, offset item_price 
 
 	loop_start5:
 		mov ax, [si] ; load inventory id into ax
@@ -551,7 +551,7 @@ sales_report:
 		call print_string ; print the string
 
 		call print_tab
-		
+
 		mov ax, [bx]
 		call print_int
 
@@ -571,7 +571,7 @@ sales_report:
 
     add bp, 10
 		add si, 2 ; increment SI to point to the next word
-		add bx, 2
+		add bx, 2 
 		add di, 2
 		jmp loop_start5 ; repeat the loop for the next element
 	done5:
