@@ -38,27 +38,27 @@ To begin using the Mini Grocery Inventory System, compile the provided assembly 
 
 Enter the corresponding number for the desired action.
 
-### 1. Feature Details
+## Feature Details
 
 Below is a detailed explanation of each feature in the Mini Grocery Inventory System:
 
-### 2. View Inventory
+### 1. View Inventory
 
 This feature allows you to view the current inventory of the grocery store. It displays the items with their respective ID, name, quantity, and price. Items that need restocking are displayed in red.
 
-### 3. Restock Item
+### 2. Restock Item
 
 This feature enables you to restock items in the inventory. To restock an item, first, view the inventory, then select the item's ID you wish to restock. Next, enter the amount to restock (between 1 and 9). A success message will be displayed once the item has been restocked, and the updated inventory will be shown.
 
-### 4. Sell Items
+### 3. Sell Items
 
 This feature allows you to record the sale of items in the inventory. To sell an item, first, view the inventory, then enter the item's ID you wish to sell. Next, enter the amount to sell (between 1 and 9). If there is enough quantity, a success message will be displayed, and the updated inventory will be shown. If there is not enough quantity, an error message will be displayed.
 
-### 5. Sort Items
+### 4. Sort Items
 
 This feature helps you categorize the inventory items based on their stock count. You can choose to display items that are in stock, low on stock, or out of stock.
 
-### 6. Sales Report
+### 5. Sales Report
 
 This feature generates a sales report that shows the sales made during the day. The report includes the item ID, name, quantity sold, price per unit, and total earned for each item. You can navigate back to the main menu or exit the program from the sales report screen.
 
