@@ -11,8 +11,9 @@
 	inventory_name_offset dw 20
 	inventory_quantity_offset dw 120
 	inventory_price_offset dw 140
-	sales dw 0,0,0,0,0,0,0,0,0,0,'$' ; quantity sold & total price
-	item_price dw 1, 7, 1, 1, 2, 7, 1, 2, 7, 1, '$'
+	sales dw 0,0,0,0,0,60,70,80,90,110,'$' ; quantity sold & total price
+	item_price dw 4, 7, 3, 1, 2, 7, 5, 2, 7, 9, '$'
+	total_sales dw 0
 	
 	; syntax formatting
 	crlf db 13,10,'$'
@@ -21,7 +22,7 @@
 	dotted db '**********************************************','$'
 
 	; main menu
-	menu db 13, '----------<APU MINI GROCERY STALL>----------',13,10, '------------------MAIN MENU-----------------', 13, 10, 10 ,'1. View Inventory',13,10,'2. Restock Item',13,10,'3. Sell Items',13,10, '4. Sort Items',13,10,'5. Sales Report',13,10,'0. Exit',13,10,'$'
+	menu db 13, '----------<APU MINI GROCERY STALL>----------',13,10, '------------------MAIN MENU-----------------', 13, 10, 10 ,'1. View Inventory',13,10,'2. Restock Item',13,10,'3. Sell Items',13,10, '4. Sort Items',13,10,'5. Sales Report',13,10,'0. Exit the Program',13,10,'$'
 	invalid_input db 13,10,'Invalid input. Please try again.',13,10,'$'
 	
 	; CRUD labels
@@ -49,8 +50,8 @@
 	on_stock_label db 13, 10, 'Items are In Stock!', 13, 10, '$'
 	
 	;sales made
-
-
+	sales_header db 13,10, '-----------------------<APU MINI GROCERY STALL>--------------------',13,10, '----------------------------<SALES REPORT>-------------------------',13,10,'ID',9,'Name',9,9, 'Quantity Sold',9, 'Price/unit', 9, 'Total Earned',13,10,'$'
+	sales_label db '=================================================================', 13, 10, 9,9,32,32,9,'SALES OF THE DAY', 13, 10, '=================================================================', 13, 10, '1. Back to Main Menu', 13, 10, '0. Exit the Program', 13, 10 , 13, 10,'Enter your choice: $'
 	; misc
 	user_choice db 13, 10, 'Enter your choice: $'
 	user_quit db 13, 10, 'Thanks for using the program. See you again.','$'
@@ -111,7 +112,7 @@ main proc
 		ret
 	sales_report_interface:
 		call sales_report
-		call user_navigate
+		call sales_navigate
 		ret
 	exit_program_interface:
 		call clear_screen
@@ -141,6 +142,19 @@ user_navigate:
 	
 	cmp al, '3'
 	je sales_inventory_interface
+	
+	jmp main
+	ret
+sales_navigate:
+	lea dx, sales_label
+	mov ah, 09h
+	int 21h
+
+	mov ah, 01h ; read character
+	int 21h
+
+	cmp al, '0'
+	je exit_program_interface
 	
 	jmp main
 	ret
@@ -515,7 +529,7 @@ low_in_stock_prompt:
 sales_report:
   call clear_screen
 	; Code to generate sales reports
-	mov dx, offset inventory_header
+	mov dx, offset sales_header
 	mov ah, 09
 	int 21h
 
@@ -542,6 +556,11 @@ sales_report:
 		call print_int
 
 		call print_double_tab
+	
+	  mov ax, [si + 140]
+		call print_int
+	
+	  call print_double_tab
 
 		mov cx, [bx]
 		mov ax, [di]
@@ -556,6 +575,7 @@ sales_report:
 		add di, 2
 		jmp loop_start5 ; repeat the loop for the next element
 	done5:
+	  
 	ret
 
 ; **********************************************
