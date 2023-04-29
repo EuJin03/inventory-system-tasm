@@ -8,8 +8,8 @@ The Mini Grocery Inventory System is a simple inventory management tool built us
 
 ## Requirements
 
-- DOSBox
-- TASM (Turbo Assembler) and TLINK (Turbo Linker)
+- [DOSBox](https://www.dosbox.com/download.php)
+- [TASM](https://sourceforge.net/projects/guitasm8086/) (Turbo Assembler) and TLINK (Turbo Linker)
 
 ## Usage
 
@@ -18,11 +18,11 @@ The Mini Grocery Inventory System is a simple inventory management tool built us
 3. Run the following commands to compile the assembly source code and generate the executable file:
 
 ```bash
-tasm \<file\>.asm
+tasm <file>.asm
 
-tlink \<file\>.obj
+tlink <file>.obj
 
-\<file\>.exe
+<file>.exe
 ```
 
 ## Getting Started
