@@ -18,10 +18,11 @@ The Mini Grocery Inventory System is a simple inventory management tool built us
 3. Run the following commands to compile the assembly source code and generate the executable file:
 
 ```bash
+# To assemble the code
 tasm <file>.asm
-
+# To link the object file
 tlink <file>.obj
-
+# To run an executable file
 <file>.exe
 ```
 
