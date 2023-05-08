@@ -160,25 +160,7 @@ sales_navigate:
 	ret
 print_int:
 	; convert the word to a string and print it
-	push bx ; save BX on the stack
-	mov bx, 10 ; set BX to 10 (divisor)
-	xor cx, cx ; clear CX (counter)
-	convert_loop:
-		xor dx, dx ; clear the high byte of DX
-		div bx ; divide AX by BX
-		add dl, '0' ; convert the remainder to ASCII
-		push dx ; save the digit on the stack
-		inc cx ; increment the counter
-		cmp ax, 0 ; check if AX is zero
-		jne convert_loop ; if not, repeat the loop
-	print_loop2:
-		pop dx ; get the next digit from the stack
-		mov ah, 02 ; write character
-		int 21h ; print the digit
-		dec cx ; decrement the counter
-		cmp cx, 0 ; check if all digits have been printed
-		jne print_loop2 ; if not, repeat the loop
-		pop bx ; restore BX from the stack
+
 		ret
 
 check_int:
@@ -191,43 +173,13 @@ check_int:
 print_string:
 	; Print a string of characters
 	; Input: CX = length of string, DX = offset of string
-	push ax ; save registers
-	push bx
-	push cx
-	mov bx, dx ; set BX to the offset of the string
-	mov cx, 10 ; set the length to 10 characters
-	print_loop:
-		mov dl, [bx] ; load character from memory
-		int 21h ; output the character
-		inc bx ; increment offset to next character
-		loop print_loop ; repeat until 10 characters are printed
-	print_done:
-	pop cx ; restore registers
-	pop bx
-	pop ax
+
 	ret
 
 print_red_color:
 	; Print a string of characters
 	; Input: CX = length of string, DX = offset of string
-	push ax ; save registers
-	push bx
-	push cx
-	mov bx, dx ; set BX to the offset of the string
-	mov cx, 10 ; set the length to 10 characters
-	print_loop3:
-		mov dl, [bx] ; load character from memory
-		mov ah, 09h
-		mov al, dl 
-		mov bl, 04h ; set background color to black with blink
-		or bl, 80h
-		int 10h
-		inc bx ; increment offset to next character
-		loop print_loop3 ; repeat until 10 characters are printed
-	print_done3:
-	pop cx ; restore registers
-	pop bx
-	pop ax
+
 	ret
 
 
@@ -329,76 +281,7 @@ restock_inventory:
 
 sales_inventory:
 	; Code to restock item
-	lea dx, sell_item_id_label
-	mov ah, 09h
-	int 21h 
 
-	mov ah, 01
-	int 21h
-
-	sub al, 30h ; convert to integer
-	add al, al ; multiply by 2
-	sub ax, 136 ; subtract 136 to get the offset
-	mov stock_id, ax 
-
-	lea dx, sell_item_amount_label
-	mov ah, 09h 
-	int 21h
-
-	mov ah, 01
-	int 21h
-	sub al, 30h
-	sub ax, 256
-	mov cx, ax
-
-	lea si, inventory
-	add si, stock_id
-	mov bx, [si] ; load stock into bx
-	sub bx, cx
-	cmp bx, 0
-	js reset_quantity
-
-	mov word ptr [si], bx
-	jmp sold_quantity
-
-	reset_quantity: 
-		mov bx, [si]
-		mov word ptr [si], bx
-		call clear_screen
-		call print_newline
-		call print_asterisk
-		lea dx, sell_item_fail
-		mov ah, 09h 
-		int 21h 
-		call print_asterisk
-		call print_newline
-		call view_inventory
-		call user_navigate
-		ret 
-	
-	sold_quantity:
-	  call sales_done
-		call clear_screen
-		call print_newline
-		call print_asterisk
-		lea dx, sell_item_success
-		mov ah, 09h 
-		int 21h 
-		call print_asterisk
-		call print_newline
-		call view_inventory
-		call user_navigate
-		ret
-	sales_done: 
-		mov ax, stock_id 
-		sub ax, 120 
-		mov stock_id, ax
-		lea si, sales 
-		add si, stock_id
-		mov ax, [si]
-		add cx, ax 
-		mov word ptr [si], cx
-		ret
 	ret
 
 sort_inventory:
@@ -529,52 +412,7 @@ low_in_stock_prompt:
 sales_report:
   call clear_screen
 	; Code to generate sales reports
-	mov dx, offset sales_header
-	mov ah, 09
-	int 21h
-
-  mov bp, 0
-	lea si, inventory
-	mov bx, offset sales 
-	mov di, offset item_price 
-
-	loop_start5:
-		mov ax, [si] ; load inventory id into ax
-		cmp ax, 10 ; check if end of array
-		ja done5 
-		call print_int ; print the integer
-
-		call print_tab
-
-		mov dx, offset inventory + 20 ; load inventory name into dx
-		add dx, bp ; add bp to dx to point to the next word
-		call print_string ; print the string
-
-		call print_tab
-
-		mov ax, [bx]
-		call print_int
-
-		call print_double_tab
 	
-	  mov ax, [si + 140]
-		call print_int
-	
-	  call print_double_tab
-
-		mov cx, [bx]
-		mov ax, [di]
-		mul cx
-		call print_int
-	
-		call print_newline
-
-    add bp, 10
-		add si, 2 ; increment SI to point to the next word
-		add bx, 2 
-		add di, 2
-		jmp loop_start5 ; repeat the loop for the next element
-	done5:
 	  
 	ret
 
