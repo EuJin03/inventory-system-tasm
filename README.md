@@ -1,3 +1,5 @@
+# ! Text me on socials to purchase the code
+
 # APU Mini Grocery Inventory System User Manual
 
 Welcome to the Mini Grocery Inventory System user manual. This document will guide you through the usage and functionality of the system.
